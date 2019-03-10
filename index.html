@@ -6,14 +6,17 @@
 </head>
 
 <body>
-    <select id="cards" name="cardDropdown">
+    <select id="cardDropdown" name="Filter 1">
+    </select>
+    <select id="cardDropdown2" name="Filter 2">
+    </select>
+    <select id="cardDropdown3" name="Filter 3">
     </select>
     <table id="display" style="width:100%">
     </table>
 
     <script>
         //Displays the cards neatly in a table
-        var items = [];
         $.getJSON("cardsinfo.json", function (data) {
             var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
             $.each(data.cards, function (i, item) {
@@ -29,14 +32,13 @@
         dropdown.empty();
         dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
         dropdown.prop('selectedIndex', 0);
-
-        const url = './cardsinfo.json';
-
-        // Populate dropdown with list of provinces
-        $.getJSON(url, function (data) {
-            $.each(data, function (key, entry) {
-                dropdown.append($('<option></option>').attr('value', key.abbreviation).text(key.name));
-            })
+        var items = [];
+        $.getJSON("cardsinfo.json", function (data) {
+            console.log(items);
+            Object.keys(data.cards[0]).forEach(function (key) {
+                items.push(key)
+                dropdown.append('<option>' + key + '</option>');
+            });
         });
     </script>
 </body>
