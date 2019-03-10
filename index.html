@@ -1,23 +1,42 @@
-<script src="listItem.js"></script>
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<head>
+    <script src="listItem.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
 
-<select id="cards" name="cardDropdown">
-</select>
+<body>
+    <select id="cards" name="cardDropdown">
+    </select>
+    <table id="display" style="width:100%">
+    </table>
 
-<script>
-    let dropdown = $('#cardDropdown');
+    <script>
+        //Displays the cards neatly in a table
+        var items = [];
+        $.getJSON("cardsinfo.json", function (data) {
+            var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
+            $.each(data.cards, function (i, item) {
+                trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
+                    '</td></tr>';
+            });
+            $('#display').append(trHTML);
+        });
+    </script>
 
-    dropdown.empty();
+    <script>
+        let dropdown = $('#cardDropdown');
+        dropdown.empty();
+        dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
+        dropdown.prop('selectedIndex', 0);
 
-    dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
-    dropdown.prop('selectedIndex', 0);
+        const url = './cardsinfo.json';
 
-    const url = './cardsinfo.json';
-
-    // Populate dropdown with list of provinces
-    $.getJSON(url, function(data) {
-        $.each(data, function(key, entry) {
-            dropdown.append($('<option></option>').attr('value', entry.abbreviation).text(entry.name));
-        })
-    });
-</script>
+        // Populate dropdown with list of provinces
+        $.getJSON(url, function (data) {
+            $.each(data, function (key, entry) {
+                dropdown.append($('<option></option>').attr('value', key.abbreviation).text(key.name));
+            })
+        });
+    </script>
+</body>
