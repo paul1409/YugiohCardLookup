@@ -7,6 +7,7 @@
 </head>
 
 <body>
+    <p>Select card properties to filter cards. If a card does not have any of the specified properties, they will be excluded.</p>
     <select id="cardDropdown" name="Filter 1">
     </select>
     <select id="cardDropdown2" name="Filter 2">
@@ -66,15 +67,17 @@
         function renderTable() {
             $("#display tr").remove();
             $.getJSON("cardsinfo.json", function(data) {
-                var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card Description</th></tr>';
+                var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>' + selection[0] +
+                    '</th><th>' + selection[1] + '</th><th>' + selection[2] + '</th><th>Card Description</th></tr>';
                 $.each(data.cards, function(i, item) {
                     if (item[selection[0]] == null || item[selection[1]] == null || item[selection[2]] == null ||
                         item[selection[0]] == "" || item[selection[1]] == "" || item[selection[2]] == "")
                         console.log("Skip")
-                    else trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
+                    else trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item[selection[0]] + '</td><td>' + item[selection[1]] + '</td><td>' + item[selection[2]] + '</td><td>' + item.desc +
                         '</td></tr>';
                 });
                 $('#display').append(trHTML);
+                $('#debugDiv').append("<p> Filtering cards based on null values: " + selection + "</p>");
                 console.trace();
             });
         }
