@@ -17,31 +17,56 @@
     </table>
 
     <script>
-        //Displays the cards neatly in a table
-        $.getJSON("cardsinfo.json", function(data) {
-            var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
-            $.each(data.cards, function(i, item) {
-                trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
-                    '</td></tr>';
+        var ignore = ["id", "name", "desc", "type", "set_tag", "setcode", "image_url", "image_url_small", "attribute", "level", "race"];
+        var selection = []
+        populate('#cardDropdown', ignore)
+        $("#cardDropdown").on("change", function() {
+            var ignore2 = filter('#cardDropdown', ignore)
+            console.log(ignore2);
+            populate('#cardDropdown2', ignore2);
+            $("#cardDropdown2").on("change", function() {
+                var ignore3 = filter('#cardDropdown2', ignore2);
+                populate('#cardDropdown3', ignore3);
+                console.log(ignore3);
+                $("#cardDropdown3").on("change", function() {
+                    var ignore4 = filter('#cardDropdown2', ignore3);
+                    console.log(selection);
+                    renderTable();
+                });
             });
-            $('#display').append(trHTML);
         });
-    </script>
 
-    <script>
-        let dropdown = $('#cardDropdown');
-        dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
-        dropdown.prop('selectedIndex', 0);
-        var ignore = ["id", "name", "desc", "type", "set_tag", "setcode", "image_url", "image_url_small", "attribute", "level"];
-        $.getJSON("cardsinfo.json", function(data) {
-            console.log(ignore);
-            Object.keys(data.cards[0]).forEach(function(key) {
-                if (!ignore.includes(key)) {
-                    console.log(key)
-                    dropdown.append('<option>' + key + '</option>');
-                }
+        function populate(dropName, ignoreArr) {
+            let dropdown = $(dropName);
+            dropdown.empty();
+            dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
+            dropdown.prop('selectedIndex', 0);
+            $.getJSON("cardsinfo.json", function(data) {
+                Object.keys(data.cards[0]).forEach(function(key) {
+                    if (!ignore.includes(key)) {
+                        dropdown.append($("<option>").attr('value', key).text(key));
+                    }
+                });
             });
-        });
+        }
+
+        function filter(dropname, ignoreArr) {
+            var selValue = $(dropname).val();
+            selection = selection.concat(selValue);
+            var ignore2 = ignoreArr.concat(selValue);
+            return ignore2;
+        }
+
+        function renderTable() {
+            $.getJSON("cardsinfo.json", function(data) {
+                var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
+                $.each(data.cards, function(i, item) {
+                    if (item[selection[0]] != null && item[selection[1]] != null && item[selection[2]] != null)
+                        trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
+                        '</td></tr>';
+                });
+                $('#display').append(trHTML);
+            });
+        }
     </script>
 </body>
