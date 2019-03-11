@@ -18,19 +18,20 @@
 
     <script>
         var ignore = ["id", "name", "desc", "type", "set_tag", "setcode", "image_url", "image_url_small", "attribute", "level", "race"];
-        var selection = []
+        var selection = ["", "", ""]
         populate('#cardDropdown', ignore)
         $("#cardDropdown").on("change", function() {
-            var ignore2 = filter('#cardDropdown', ignore)
+            var ignore2 = filter('#cardDropdown', ignore, 0)
             console.log(ignore2);
             populate('#cardDropdown2', ignore2);
             $("#cardDropdown2").on("change", function() {
-                var ignore3 = filter('#cardDropdown2', ignore2);
+                var ignore3 = filter('#cardDropdown2', ignore2, 1);
                 populate('#cardDropdown3', ignore3);
                 console.log(ignore3);
                 $("#cardDropdown3").on("change", function() {
-                    var ignore4 = filter('#cardDropdown2', ignore3);
+                    var ignore4 = filter('#cardDropdown3', ignore3, 2);
                     console.log(selection);
+                    console.log(ignore)
                     renderTable();
                 });
             });
@@ -43,17 +44,18 @@
             dropdown.prop('selectedIndex', 0);
             $.getJSON("cardsinfo.json", function(data) {
                 Object.keys(data.cards[0]).forEach(function(key) {
-                    if (!ignore.includes(key)) {
+                    if (!ignore.includes(key) && !selection.includes(key)) {
                         dropdown.append($("<option>").attr('value', key).text(key));
                     }
                 });
             });
         }
 
-        function filter(dropname, ignoreArr) {
+        function filter(dropname, ignoreArr, index) {
             var selValue = $(dropname).val();
-            selection = selection.concat(selValue);
+            selection[index] = selValue;
             var ignore2 = ignoreArr.concat(selValue);
+            $("#display tr").remove();
             return ignore2;
         }
 
@@ -61,8 +63,10 @@
             $.getJSON("cardsinfo.json", function(data) {
                 var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
                 $.each(data.cards, function(i, item) {
-                    if (item[selection[0]] != null && item[selection[1]] != null && item[selection[2]] != null)
-                        trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
+                    if (item[selection[0]] == null || item[selection[1]] == null || item[selection[2]] == null ||
+                        item[selection[0]] == "" || item[selection[1]] == "" || item[selection[2]] == "")
+                        console.log("Skip")
+                    else trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
                         '</td></tr>';
                 });
                 $('#display').append(trHTML);
