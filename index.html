@@ -13,25 +13,28 @@
     </select>
     <select id="cardDropdown3" name="Filter 3">
     </select>
+    <div id="debugDiv"></div>
     <table id="display" style="width:100%">
     </table>
 
     <script>
         var ignore = ["id", "name", "desc", "type", "set_tag", "setcode", "image_url", "image_url_small", "attribute", "level", "race"];
         var selection = ["", "", ""]
+        $("#cardDropdown2").hide();
+        $("#cardDropdown3").hide();
+
         populate('#cardDropdown', ignore)
         $("#cardDropdown").on("change", function() {
             var ignore2 = filter('#cardDropdown', ignore, 0)
-            console.log(ignore2);
             populate('#cardDropdown2', ignore2);
+            $("#cardDropdown3").hide();
+            $('#cardDropdown2').show();
             $("#cardDropdown2").on("change", function() {
                 var ignore3 = filter('#cardDropdown2', ignore2, 1);
+                $("#cardDropdown3").show();
                 populate('#cardDropdown3', ignore3);
-                console.log(ignore3);
                 $("#cardDropdown3").on("change", function() {
                     var ignore4 = filter('#cardDropdown3', ignore3, 2);
-                    console.log(selection);
-                    console.log(ignore)
                     renderTable();
                 });
             });
@@ -52,6 +55,7 @@
         }
 
         function filter(dropname, ignoreArr, index) {
+            $("#debugDiv").empty();
             var selValue = $(dropname).val();
             selection[index] = selValue;
             var ignore2 = ignoreArr.concat(selValue);
@@ -60,8 +64,9 @@
         }
 
         function renderTable() {
+            $("#display tr").remove();
             $.getJSON("cardsinfo.json", function(data) {
-                var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
+                var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card Description</th></tr>';
                 $.each(data.cards, function(i, item) {
                     if (item[selection[0]] == null || item[selection[1]] == null || item[selection[2]] == null ||
                         item[selection[0]] == "" || item[selection[1]] == "" || item[selection[2]] == "")
@@ -70,7 +75,19 @@
                         '</td></tr>';
                 });
                 $('#display').append(trHTML);
+                console.trace();
             });
+        }
+        console.trace = function(message) {
+            $('#debugDiv').append('<p>' + getStackTrace() + '</p>');
+        };
+
+        function getStackTrace() {
+            let stack = new Error().stack || '';
+            stack = stack.split('\n').map(function(line) {
+                return line.trim();
+            });
+            return stack.splice(stack[0] == 'Error' ? 2 : 1).join('\n');
         }
     </script>
 </body>
