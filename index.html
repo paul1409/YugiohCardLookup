@@ -2,6 +2,7 @@
     <script src="listItem.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="cardsinfo.json"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -17,9 +18,9 @@
 
     <script>
         //Displays the cards neatly in a table
-        $.getJSON("cardsinfo.json", function (data) {
+        $.getJSON("cardsinfo.json", function(data) {
             var trHTML = '<tr><th>Card ID</th><th>Card Name</th><th>Card description</th></tr>';
-            $.each(data.cards, function (i, item) {
+            $.each(data.cards, function(i, item) {
                 trHTML += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.desc +
                     '</td></tr>';
             });
@@ -32,12 +33,14 @@
         dropdown.empty();
         dropdown.append('<option selected="true" disabled>Choose Card Property</option>');
         dropdown.prop('selectedIndex', 0);
-        var items = [];
-        $.getJSON("cardsinfo.json", function (data) {
-            console.log(items);
-            Object.keys(data.cards[0]).forEach(function (key) {
-                items.push(key)
-                dropdown.append('<option>' + key + '</option>');
+        var ignore = ["id", "name", "desc", "type", "set_tag", "setcode", "image_url", "image_url_small", "attribute", "level"];
+        $.getJSON("cardsinfo.json", function(data) {
+            console.log(ignore);
+            Object.keys(data.cards[0]).forEach(function(key) {
+                if (!ignore.includes(key)) {
+                    console.log(key)
+                    dropdown.append('<option>' + key + '</option>');
+                }
             });
         });
     </script>
